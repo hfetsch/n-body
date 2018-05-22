@@ -12,7 +12,7 @@ class Region{
         double coords [DIM];
         //half of a side length
         double half_length;
-        //array of sub-regions
+        //array of sub-regions (nullptr when there are none)
         Region* children [CHILDREN];
         //center-of-mass of the region
         Body* com;
@@ -22,8 +22,11 @@ class Region{
         //used to decide whether we should switch com and new_com
         bool parity;
 
+        //list of bodies to add later
+        std::list<Body> add_queue;
+
         //returns true if the region contains this point
-        bool contains(double [DIM]); //IMPLEMENT
+        bool contains(double [DIM]);
 
         //update velocity and position, and move bodies between regions
         /*
@@ -40,5 +43,8 @@ class Region{
                 -add returned bodies to the add_queue
             -calculate new_com, factoring in each body in add_queue that is in this region
         */
-       std::list<Body> update(Body);
+       std::list<Body> update(std::list<Body>&); //IMPLEMENT
+
+       //Constructor: (coords, half_length, parity)
+       Region(double*, double, bool);
 };

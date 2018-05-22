@@ -5,6 +5,9 @@
 #include "constants.hpp"
 #include <cmath>
 
+using namespace std;
+using namespace math;
+
 //retuns the distance squared between two positions
 double squared_dist(double [DIM] p1, double [DIM] p2){
     double sum = 0;
@@ -21,6 +24,6 @@ double dist(double [DIM] p1, double [DIM] p2) {
 
 //returns the acceleration on body 1 from body 2
 double accel(Body& b1, Body& b2) {
-    return b2.mass*G/squared_dist(b1.coords, b2.coord);
+    return b2.mass * G / squared_dist(b1.coords, b2.coord);
 }
 

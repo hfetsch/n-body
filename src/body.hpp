@@ -13,6 +13,12 @@ class Body {
         double vel [DIM];
         //mass
         double mass;
+
+        //Constructor: (position, mass)
+        //default initial velocity 0
+        Body(double*, double);
+        //Constructor: (position, velocity, mass)
+        Body(double*, double*, double);
     
 };
 
