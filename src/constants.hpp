@@ -10,10 +10,12 @@
 //should be 2^DIM
 #define CHILDREN (1<<DIM)
 
-long COUNTER;
+long long COUNTER;
 
+//region constraints
+#define MIN_SIZE 0.001 //minimum half-length of a region
 
 //physical constants
-#define G 1
+#define G 1 //gravitational constant
 
 #endif

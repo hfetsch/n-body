@@ -14,9 +14,9 @@ class Region{
         double half_length;
         //array of sub-regions (nullptr when there are none)
         Region* children [CHILDREN];
-        //center-of-mass of the region
+        //center-of-mass of the region (nullptr when none)
         Body* com;
-        //new body position in this region
+        //new body position in this region (nullptr when none)
         Body* new_com;
 
         //used to decide whether we should switch com and new_com
@@ -43,8 +43,22 @@ class Region{
                 -add returned bodies to the add_queue
             -calculate new_com, factoring in each body in add_queue that is in this region
         */
-       std::list<Body> update(std::list<Body>&); //IMPLEMENT
+        std::list<Body> update(std::list<Body>&);
 
-       //Constructor: (coords, half_length, parity)
-       Region(double*, double, bool);
+        
+
+        //Default Constructor (should only be used in main)
+        Region::Region();
+        //Constructor: (coords, half_length, parity)
+        Region(double*, double, bool);
+
+    private:
+        //update a body's velocity and position
+        double* update_body(Body&, Body&);
+
+        //split into subregions and push bodies from add_queue
+        void split();
 };
+
+//global pointer to the top tree region
+Region* TREE_POINTER;
