@@ -49,13 +49,8 @@ bool Region::contains(double* pos) {
             -calculate new_com, factoring in each body in add_queue that is in this region
         */
 list<Body> Region::update(list<Body>& bodies) {
-    //first switch the parity of com if necessary
-    if(parity == COUNTER % 2) {
-        Body* temp = com;
-        com = new_com;
-        delete temp; //note: may fail silently if temp is nullptr but that's fine
-        parity = !parity;
-    }
+    //first, switch the parity of COM if neccessary
+    check_parity();
 
     //add the bodies we were passed to the queue
     add_queue.merge(bodies);
@@ -98,9 +93,24 @@ list<Body> Region::update(list<Body>& bodies) {
 }
 
 //update body using pos/vel/mass of old
-double* Region::update_body(Body& old, Body& body) {
+void Region::update_body(Body& old, Body& body) {
+    //make an array to hold acceleration
+    double acc [DIM] = {0};
+    //calculate acceleration starting at the top region
+    TREE_POINTER.update_acc(old, &acc);
+}
 
+void Region::update_acc(Body& old, double* acc) {
+    //first, switch the parity of this region's COM if necessary
+    check_parity();
 
+    //if this is a leaf region, calculate accleration and return
+    if(chilren == nullptr) {
+        if(com != nullptr && com.mass != 0) {
+            add_accel(old, com, acc);
+        }
+        return; //now we're done
+    }
 }
 
 //split into child regions
@@ -117,7 +127,20 @@ void Region::split() {
             pos[j] = OFFESTS[i][j] * hl + coords[j];
         }
         //create the new region
-        //note: we want the opposite parity so the new region gets updated
-        children[i] = new Region(&pos, hl, !parity);
+        //note: we want the same parity so the children don't get updated yet
+        //(note that bodies pushed to children have already been moved)
+        //also note that we want to push bodies to new_com because bodies updated elsewhere
+        //  are still in new_com in their regions
+        children[i] = new Region(&pos, hl, parity);
+    }
+}
+
+void Region::check_parity() {
+    //switch the parity of com if necessary
+    if(parity == COUNTER % 2) {
+        Body* temp = com;
+        com = new_com;
+        delete temp; //note: may fail silently if temp is nullptr but that's fine
+        parity = !parity;
     }
 }

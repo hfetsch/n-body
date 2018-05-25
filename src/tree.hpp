@@ -53,11 +53,20 @@ class Region{
         Region(double*, double, bool);
 
     private:
+        //flip parity if necessary
+        void check_parity();
+
         //update a body's velocity and position
-        double* update_body(Body&, Body&);
+        void update_body(Body&, Body&);
+
+        //recursive function to calculate acceleration
+        void update_acc(Body&, double*);
 
         //split into subregions and push bodies from add_queue
         void split();
+
+        //push bodies in add_queue to child regions
+        void push_bodies();
 };
 
 //global pointer to the top tree region

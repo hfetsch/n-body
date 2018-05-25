@@ -5,6 +5,9 @@
 
 using namespace std;
 
+//TODO: write all destructors
+//TODO: logic to merge masses that get too close
+
 
 void loop() {
 
