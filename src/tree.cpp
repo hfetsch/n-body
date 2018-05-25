@@ -103,6 +103,21 @@ double* Region::update_body(Body& old, Body& body) {
 
 }
 
+//split into child regions
+//potential memory leak if children already contains region pointers
 void Region::split() {
+    //get the new half_length of the subregions
+    double hl = half_length / 2;
 
+    //create each subregion
+    int pos [DIM];
+    for(int i = 0; i < CHILDREN; ++i) {
+        for(int j = 0; j < DIM; ++j) {
+            //set each new coordinate to the offset times half side length, plus current position
+            pos[j] = OFFESTS[i][j] * hl + coords[j];
+        }
+        //create the new region
+        //note: we want the opposite parity so the new region gets updated
+        children[i] = new Region(&pos, hl, !parity);
+    }
 }
