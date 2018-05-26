@@ -1,5 +1,6 @@
 
 #include "tree.hpp"
+#include "physics.hpp"
 #include <stddef.h>
 
 using namespace std;
@@ -48,12 +49,11 @@ bool Region::contains(double* pos) {
                 -add returned bodies to the add_queue
             -calculate new_com, factoring in each body in add_queue that is in this region
         */
-list<Body> Region::update(list<Body>& bodies) {
+void Region::update() {
     //first, switch the parity of COM if neccessary
     check_parity();
 
-    //add the bodies we were passed to the queue
-    add_queue.merge(bodies);
+    
 
     //decide whether there are subregions
     if(children[0] == nullptr) { //case: no children
@@ -92,6 +92,27 @@ list<Body> Region::update(list<Body>& bodies) {
     }
 }
 
+//update new_com based on children and add_queue
+void Region::update_com() {
+    //initialize new_com as a new body
+    if(new_com == nullptr) {
+        new_com = new Body{};
+    } else {
+        new_com = Body{};
+    }
+
+    //add each child's new_com, weighted by mass
+    for(int i = 0; i < CHILDREN; ++i) {
+        new_com -> mass += children[i]->new_com->mass;
+        for(int j = 0; j < DIM; ++j) {
+            new_com -> pos[j] += children[i]->new_com->pos[j] * children[j]->new_com->mass;
+        }
+    }
+
+    //add each body in add_queue
+
+}
+
 //update body using pos/vel/mass of old
 void Region::update_body(Body& old, Body& body) {
     //make an array to hold acceleration
@@ -100,16 +121,39 @@ void Region::update_body(Body& old, Body& body) {
     TREE_POINTER.update_acc(old, &acc);
 }
 
+//recurse through the tree
+//update new_com if there are new bodies in add_queue
+//then push bodies in add_queue to child regions
 void Region::update_acc(Body& old, double* acc) {
     //first, switch the parity of this region's COM if necessary
     check_parity();
 
+    //if items have been pushed to the add_queue
+    //update new_com to include those, then push them down
+    if(!add_queue.empty()) {
+        update_com();
+    }
+
+    //if there's nothing left in this region, return
+    //note: we should clean up empty regions in update()
+    if(com -> mass == 0)
+        return;
+
     //if this is a leaf region, calculate accleration and return
-    if(chilren == nullptr) {
-        if(com != nullptr && com.mass != 0) {
+    if(children == nullptr) {
+        if(com != nullptr) {
             add_accel(old, com, acc);
         }
-        return; //now we're done
+    } else { //if we have children, choose to approximate or recurse
+        if(check_dist(old, *this)) { //if we're far enough to approximate
+            //add acceleration from this region's COM
+            add_accel(old, com, acc);
+        } else { //we're too close, so we need to recurse
+            //update acceleration from each child region
+            for(int i = 0; i < CHILDREN; ++i) {
+                children[i] -> update_acc(old, acc);
+            }
+        }
     }
 }
 
@@ -136,11 +180,15 @@ void Region::split() {
 }
 
 void Region::check_parity() {
-    //switch the parity of com if necessary
+    //switch the parity of com and add_queue if necessary
     if(parity == COUNTER % 2) {
         Body* temp = com;
         com = new_com;
         delete temp; //note: may fail silently if temp is nullptr but that's fine
+
+        add_queue.merge(add_queue_new);
+        add_queue_new = list<Body>{};
+
         parity = !parity;
     }
 }

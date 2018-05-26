@@ -2,6 +2,14 @@
 #include "body.hpp"
 
 //Constructor
+//initialize everything to 0
+Body::Body() 
+:pos{0}, vel{0}, mass{0}
+{
+    //nothing to do
+}
+
+//Constructor
 //takes an array of size DIM and a mass
 Body::Body(double* p, double m) 
 :mass{m}

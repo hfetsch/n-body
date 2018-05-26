@@ -64,3 +64,11 @@ double normalize(double* vec, int len) {
         vec[i] /= mag;
     }
 }
+
+//check if a region is far enough from a body that we should approximate
+//returns true if far enough away
+//current condition: return true if distance is more than 8 times region half_length
+bool check_dist(Body& b1, Region& reg) {
+    double dist = dist(b1.pos, reg.coords);
+    return (dist >= reg.half_length * 8);
+}

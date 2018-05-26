@@ -14,6 +14,9 @@ class Body {
         //mass
         double mass;
 
+        //Constructor: no parameters
+        //everything initialized to 0
+        Body();
         //Constructor: (position, mass)
         //default initial velocity 0
         Body(double*, double);

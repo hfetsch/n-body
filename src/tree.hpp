@@ -4,6 +4,9 @@
 
 #include "body.hpp"
 
+#ifndef TREE_HPP_INCLUDED
+#define TREE_HPP_INCLUDED 1
+
 //
 class Region{
 
@@ -22,8 +25,10 @@ class Region{
         //used to decide whether we should switch com and new_com
         bool parity;
 
-        //list of bodies to add later
+        //list of bodies to push down
         std::list<Body> add_queue;
+        //new list of bodies to be added
+        std::list<Body> add_queue_new;
 
         //returns true if the region contains this point
         bool contains(double [DIM]);
@@ -36,14 +41,13 @@ class Region{
             -update velocity of body
             -calculate new position:
                 -if new position is in this region, set new_com to new postion
-                -else, set new_com to nullptr and return new body position
+                -else, set new_com to nullptr and put new body position in top add_queue_new
         -if we have subregions:
             -for each subregion:
                 -push items in add_queue as appropriate
-                -add returned bodies to the add_queue
             -calculate new_com, factoring in each body in add_queue that is in this region
         */
-        std::list<Body> update(std::list<Body>&);
+        void update();
 
         
 
@@ -55,6 +59,9 @@ class Region{
     private:
         //flip parity if necessary
         void check_parity();
+
+        //update new_com based on children and add_queue
+        void update_com();
 
         //update a body's velocity and position
         void update_body(Body&, Body&);
@@ -71,3 +78,5 @@ class Region{
 
 //global pointer to the top tree region
 Region* TREE_POINTER;
+
+#endif

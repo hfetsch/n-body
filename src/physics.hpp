@@ -3,6 +3,10 @@
 
 #include "body.hpp"
 #include "constants.hpp"
+#include "tree.hpp"
+
+#ifndef PHYSICS_HPP_INCLUDED
+#define PHYSICS_HPP_INCLUDED 1
 
 //retuns the distance squared between two positions
 double squared_dist(double [DIM], double [DIM]);
@@ -20,3 +24,9 @@ void add_accel(Body&, Body&, double*);
 
 //normalize a vector of given length (modifies vector)
 double normalize(double*, int);
+
+//check if a region is far enough from a body that we should approximate
+//returns true if far enough away
+bool check_dist(Body&, Region&);
+
+#endif
